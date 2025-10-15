@@ -3,6 +3,7 @@ import bme280
 import os
 import time
 import pytz
+import gpiozeros
 
 def initialize_Sensors():
     # BME280 sensor address (default address)
@@ -15,9 +16,30 @@ def initialize_Sensors():
     calibration_params = bme280.load_calibration_params(bus, address)
     return bus, address, calibration_params
 
+def Read_Sensors(bus, address, calibration_params):
+    # Read sensor data
+    data = bme280.sample(bus, address, calibration_params)
+
+    # Extract temperature, pressure, humidity, and corresponding timestamp
+    temperature_celsius = data.temperature
+    humidity = data.humidity
+    pressure = data.pressure
+    timestamp = data.timestamp
+    # Adjust timezone
+    # Define the timezone you want to use (list of timezones: https://gist.github.com/mjrulesamrat/0c1f7de951d3c508fb3a20b4b0b33a98)
+    desired_timezone = pytz.timezone('America/New_York')  # Replace with your desired timezone
+
+    # Convert the datetime to the desired timezone
+    timestamp = timestamp.replace(tzinfo=pytz.utc).astimezone(desired_timezone)
+
+    # Convert temperature to Fahrenheit
+    temperature_fahrenheit = (temperature_celsius * 9/5) + 32
+
+    return temperature_celsius, humidity, pressure, timestamp, temperature_fahrenheit
+
 def __main__():
     bus, address, calibration_params = initialize_Sensors()
-    
+
     # create a variable to control the while loop
     running = True
 
@@ -29,28 +51,11 @@ def __main__():
     if not file_exists:
         file.write('Time and Date, temperature (ºC), temperature (ºF), humidity (%), pressure (hPa)\n')
 
+    
     # loop forever
     while running:
         try:
-            # Read sensor data
-            data = bme280.sample(bus, address, calibration_params)
-
-            # Extract temperature, pressure, humidity, and corresponding timestamp
-            temperature_celsius = data.temperature
-            humidity = data.humidity
-            pressure = data.pressure
-            timestamp = data.timestamp
-
-            # Adjust timezone
-            # Define the timezone you want to use (list of timezones: https://gist.github.com/mjrulesamrat/0c1f7de951d3c508fb3a20b4b0b33a98)
-            desired_timezone = pytz.timezone('Europe/Lisbon')  # Replace with your desired timezone
-
-            # Convert the datetime to the desired timezone
-            timestamp_tz = timestamp.replace(tzinfo=pytz.utc).astimezone(desired_timezone)
-
-            # Convert temperature to Fahrenheit
-            temperature_fahrenheit = (temperature_celsius * 9/5) + 32
-
+            temperature_celsius, humidity, pressure, timestamp_tz, temperature_fahrenheit = Read_Sensors(bus, address, calibration_params)
             # Print the readings
             print(timestamp_tz.strftime('%H:%M:%S %d/%m/%Y') + " Temp={0:0.1f}ºC, Temp={1:0.1f}ºF, Humidity={2:0.1f}%, Pressure={3:0.2f}hPa".format(temperature_celsius, temperature_fahrenheit, humidity, pressure))
 
