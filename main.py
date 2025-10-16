@@ -3,7 +3,7 @@ import bme280
 import os
 import time
 import pytz
-import gpiozeros
+import gpiozero
 
 def initialize_Sensors():
     # BME280 sensor address (default address)
@@ -72,3 +72,6 @@ def __main__():
             print('An unexpected error occurred:', str(e))
             running = False
             file.close()
+
+if __name__ == "__main__":
+    __main__()
