@@ -18,7 +18,7 @@ def initialize_Sensors():
     else:
         # Initialize I2C bus
         bus = smbus2.SMBus(1)
-
+        
         # Load calibration parameters
         calibration_params = bme280.load_calibration_params(bus, address)
     return bus, address, calibration_params
@@ -64,6 +64,7 @@ def __main__():
     # Write the header to the file if the file does not exist
     if not file_exists:
         file.write('Time and Date, temperature (ºC), temperature (ºF), humidity (%), pressure (hPa)\n')
+    led = LED(17)
 
     
     # loop forever
@@ -75,10 +76,10 @@ def __main__():
 
             # Save time, date, temperature, humidity, and pressure in .txt file
             file.write(timestamp_tz.strftime('%H:%M:%S %d/%m/%Y') + ', {:.2f}, {:.2f}, {:.2f}, {:.2f}\n'.format(temperature_celsius, temperature_fahrenheit, humidity, pressure))
-            led = LED(17)
             led.on()
-            time.sleep(10)
+            time.sleep(3)
             led.off()
+            time.sleep(3)
 
         except KeyboardInterrupt:
             print('Program stopped')
