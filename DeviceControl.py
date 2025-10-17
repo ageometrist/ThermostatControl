@@ -5,15 +5,14 @@ import time
 import pytz
 import datetime
 
-debug = True
-if debug:
+if __debug__:
     from gpiozero import LED
 
 def initialize_Sensors():
     # BME280 sensor address (default address)
     address = 0x76
 
-    if debug:
+    if __debug__:
         bus = 1
         calibration_params = None
         gpio = NotImplemented
@@ -30,7 +29,7 @@ def Read_Sensors(bus, address, calibration_params):
     # Define the timezone you want to use (list of timezones: https://gist.github.com/mjrulesamrat/0c1f7de951d3c508fb3a20b4b0b33a98)
     desired_timezone = pytz.timezone('America/New_York')  # Replace with your desired timezone
     
-    if debug:
+    if __debug__:
         temperature_celsius = 25.0
         humidity = 50.0
         pressure = 1013.25
@@ -54,7 +53,7 @@ def Read_Sensors(bus, address, calibration_params):
     return temperature_celsius, humidity, pressure, timestamp, temperature_fahrenheit
 
 def TurnPelletStoveOn(gpio, state):
-    if debug:
+    if __debug__:
         if state:
             print("Pellet Stove ON")
         else:
