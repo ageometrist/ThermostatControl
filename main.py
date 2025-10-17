@@ -3,7 +3,7 @@ import bme280
 import os
 import time
 import pytz
-import gpiozero
+from gpiozero import LED
 import datetime
 
 debug = False
@@ -75,7 +75,7 @@ def __main__():
 
             # Save time, date, temperature, humidity, and pressure in .txt file
             file.write(timestamp_tz.strftime('%H:%M:%S %d/%m/%Y') + ', {:.2f}, {:.2f}, {:.2f}, {:.2f}\n'.format(temperature_celsius, temperature_fahrenheit, humidity, pressure))
-            led = gpiozero.LED(17)
+            led = LED(17)
             led.on()
             time.sleep(10)
             led.off()
