@@ -30,7 +30,7 @@ def Read_Sensors(bus, address, calibration_params):
     desired_timezone = pytz.timezone('America/New_York')  # Replace with your desired timezone
     
     if __debug__:
-        temperature_celsius = 25.0
+        temperature_celsius = datetime.utcnow().second % 30 + 15.0  # Simulated temperature between 15 and 45 ºC
         humidity = 50.0
         pressure = 1013.25
         timestamp = datetime.datetime.utcnow()
@@ -63,3 +63,5 @@ def TurnPelletStoveOn(gpio, state):
             gpio.on()
         else:
             gpio.off()
+
+    return state
