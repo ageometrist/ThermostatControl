@@ -49,11 +49,11 @@ def __main__():
 
     # set up a simple schedule with the same schedule every day
     for day in range(7):
-        currentSchedule.add_schedule(day, datetime.time(0, 0), datetime.time(4, 0), 60.0) 
-        currentSchedule.add_schedule(day, datetime.time(4, 0), datetime.time(11, 0), 72.0)
+        currentSchedule.add_schedule(day, datetime.time(0, 0), datetime.time(4, 0), 61.0) 
+        currentSchedule.add_schedule(day, datetime.time(4, 0), datetime.time(11, 0), 70.0)
         currentSchedule.add_schedule(day, datetime.time(11, 0), datetime.time(16, 0), 68.0) 
-        currentSchedule.add_schedule(day, datetime.time(16, 0), datetime.time(18, 0), 72.0)
-        currentSchedule.add_schedule(day, datetime.time(18, 0), datetime.time(23, 59), 60.0)
+        currentSchedule.add_schedule(day, datetime.time(16, 0), datetime.time(18, 0), 70.0)
+        currentSchedule.add_schedule(day, datetime.time(18, 0), datetime.time(23, 59), 61.0)
     
     # loop forever
     while running:

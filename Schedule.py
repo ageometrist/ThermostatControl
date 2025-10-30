@@ -25,4 +25,4 @@ class Schedule:
                 if entry['start_time'] <= current_time <= entry['end_time']:
                     return entry['target_temperature']
                 
-        return 60  #  default temperature if no schedule matches
+        return 61  #  default temperature if no schedule matches
