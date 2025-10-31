@@ -11,16 +11,16 @@ import Schedule
 
 def GetTrueTemperature(temperature, tempsList: np.ndarray):
     # maintain a rolling list of last 10 temperature readings
-    if tempsList.count >= 10:
+    if tempsList.__len__() >= 10:
         tempsList = np.roll(tempsList, -1)
         tempsList[9] = temperature
     else:
         tempsList.append(temperature)
 
     # compute mean ignoring NaNs (handles initial empty slots)
-    float(np.nanmean(tempsList))
+    trueTemp = float(np.nanmean(tempsList))
 
-    return tempsList, temperature
+    return tempsList, trueTemp
 
 def __main__():
     bus, address, calibration_params, gpio = initialize_Sensors()
@@ -37,6 +37,10 @@ def __main__():
         file.write('Time and Date, temperature (ºC), temperature (ºF), humidity (%), pressure (hPa)\n')
     
     lastTemps = np.ndarray(10)
+    # initial rolling buffer
+    for i in range(10):
+        lastTemps[i] = np.nan
+
     trueTemperature = 0
     pellletStoveState = False
 
@@ -46,6 +50,13 @@ def __main__():
     timeTurnedOff: datetime.datetime = None
 
     app = QApplication(sys.argv)
+    
+    offDelaySeconds = 30 * 60  # 30 minutes
+    onDelaySeconds = 60 * 60   # 60 minutes
+
+    if __debug__:
+        offDelaySeconds = 10  # 30 seconds for testing
+        onDelaySeconds = 10   # 60 seconds for testing
 
     # set up a simple schedule with the same schedule every day
     for day in range(7):
@@ -88,15 +99,21 @@ def __main__():
                         timeTurnedOff = datetime.datetime.now()
                         pellletStoveState = TurnPelletStoveOn(gpio, False)
             
+            tempLabel = QLabel('Currnet Temp: {:.1f} ºF\nTarget Temp: {:.1f} ºF'.format(trueTemperature, targetTemp))
+            tempLabel.show()
+
+            stateLabel = QLabel('Pellet Stove State: {}'.format('ON' if pellletStoveState else 'OFF'))
+            stateLabel.show()
+            
             # Print the readings
             print(timestamp_tz.strftime('%H:%M:%S %d/%m/%Y') + " Temp={0:0.1f}ºC, Temp={1:0.1f}ºF, Humidity={2:0.1f}%, Pressure={3:0.2f}hPa".format(temperature_celsius, temperature_fahrenheit, humidity, pressure))
 
             # Save time, date, temperature, humidity, and pressure in .txt file
             file.write(timestamp_tz.strftime('%H:%M:%S %d/%m/%Y') + ', {:.2f}, {:.2f}, {:.2f}, {:.2f}\n'.format(temperature_celsius, temperature_fahrenheit, humidity, pressure))
-            pellletStoveState = TurnPelletStoveOn(gpio, True)
-            time.sleep(3)
-            pellletStoveState = TurnPelletStoveOn(gpio, False)
-            time.sleep(3)
+            # pellletStoveState = TurnPelletStoveOn(gpio, True)
+            # time.sleep(3)
+            # pellletStoveState = TurnPelletStoveOn(gpio, False)
+            # time.sleep(3)
 
         except KeyboardInterrupt:
             print('Program stopped')
@@ -106,6 +123,8 @@ def __main__():
             print('An unexpected error occurred:', str(e))
             running = False
             file.close()
+        
+        # sys.exit(app.exec_())
 
 if __name__ == "__main__":
     __main__()
