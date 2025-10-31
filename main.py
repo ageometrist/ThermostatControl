@@ -5,6 +5,8 @@ import datetime
 import numpy as np
 import sys
 from PySide6.QtWidgets import QApplication, QLabel
+from tkinter import *
+from tkinter import ttk
 from flask import Flask, render_template, request
 from DeviceControl import Read_Sensors, TurnPelletStoveOn, initialize_Sensors
 import Schedule
@@ -49,7 +51,15 @@ def __main__():
     timeTurnedOn: datetime.datetime = None
     timeTurnedOff: datetime.datetime = None
 
-    app = QApplication(sys.argv)
+    # app = QApplication(sys.argv)
+
+    root = Tk()
+    # root.title("Thermostat Control")
+    frm = ttk.Frame(root, padding=10)
+    frm.grid()
+    ttk.Label(frm, text="Hello World!").grid(column=0, row=0)
+    ttk.Button(frm, text="Quit", command=root.destroy).grid(column=1, row=0)
+
     
     offDelaySeconds = 30 * 60  # 30 minutes
     onDelaySeconds = 60 * 60   # 60 minutes
@@ -87,6 +97,10 @@ def __main__():
             else:
                 timeSinceOn = None
 
+            # Label(root, text='Current Temp: {:.1f} ºF\nTarget Temp: {:.1f} ºF'.format(trueTemperature, targetTemp)).pack()    
+            # Label(root, text='Pellet Stove State: {}'.format('ON' if pellletStoveState else 'OFF')).pack()
+            # root.mainloop()
+
             if trueTemperature < targetTemp - 2:
                 if pellletStoveState == False:
                     if timeSinceOff is None or timeSinceOff >= 60*30:  # 30 minute delay after turning off
@@ -99,11 +113,12 @@ def __main__():
                         timeTurnedOff = datetime.datetime.now()
                         pellletStoveState = TurnPelletStoveOn(gpio, False)
             
-            tempLabel = QLabel('Currnet Temp: {:.1f} ºF\nTarget Temp: {:.1f} ºF'.format(trueTemperature, targetTemp))
-            tempLabel.show()
+            
+            # tempLabel = QLabel('Currnet Temp: {:.1f} ºF\nTarget Temp: {:.1f} ºF'.format(trueTemperature, targetTemp))
+            # tempLabel.show()
 
-            stateLabel = QLabel('Pellet Stove State: {}'.format('ON' if pellletStoveState else 'OFF'))
-            stateLabel.show()
+            # stateLabel = QLabel('Pellet Stove State: {}'.format('ON' if pellletStoveState else 'OFF'))
+            # stateLabel.show()
             
             # Print the readings
             print(timestamp_tz.strftime('%H:%M:%S %d/%m/%Y') + " Temp={0:0.1f}ºC, Temp={1:0.1f}ºF, Humidity={2:0.1f}%, Pressure={3:0.2f}hPa".format(temperature_celsius, temperature_fahrenheit, humidity, pressure))
@@ -113,7 +128,7 @@ def __main__():
             # pellletStoveState = TurnPelletStoveOn(gpio, True)
             # time.sleep(3)
             # pellletStoveState = TurnPelletStoveOn(gpio, False)
-            # time.sleep(3)
+            time.sleep(5)
 
         except KeyboardInterrupt:
             print('Program stopped')
