@@ -11,6 +11,7 @@ from tkinter import ttk
 from flask import Flask, render_template, request
 from DeviceControl import Read_Sensors, TurnPelletStoveOn, initialize_Sensors, GetTrueTemperature
 import Schedule
+from Gui import ThermostatGUI
 
 
 
@@ -41,18 +42,9 @@ def __main__():
     timeTurnedOn: datetime.datetime = None
     timeTurnedOff: datetime.datetime = None
 
-    # app = QApplication(sys.argv)
+    app = ThermostatGUI()
+    app.run()
 
-    root = Tk()
-    # root.title("Thermostat Control")
-    frm = ttk.Frame(root, padding=10)
-    frm.grid()
-    ttk.Label(frm, text="Hello World!").grid(column=0, row=0)
-    ttk.Button(frm, text="Quit", command=root.destroy).grid(column=1, row=0)
-    
-    root.update()
-
-    
     offDelaySeconds = 30 * 60  # 30 minutes
     onDelaySeconds = 60 * 60   # 60 minutes
 
