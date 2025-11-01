@@ -4,6 +4,7 @@ import os
 import time
 import pytz
 import datetime
+import numpy as np
 
 if __debug__:
     from gpiozero import LED
@@ -65,3 +66,16 @@ def TurnPelletStoveOn(gpio, state):
             gpio.off()
 
     return state
+
+def GetTrueTemperature(temperature, tempsList: np.ndarray):
+    # maintain a rolling list of last 10 temperature readings
+    if tempsList.__len__() >= 10:
+        tempsList = np.roll(tempsList, -1)
+        tempsList[9] = temperature
+    else:
+        tempsList.append(temperature)
+
+    # compute mean ignoring NaNs (handles initial empty slots)
+    trueTemp = float(np.nanmean(tempsList))
+
+    return tempsList, trueTemp

@@ -4,25 +4,15 @@ import pytz
 import datetime
 import numpy as np
 import sys
+import threading
 from PySide6.QtWidgets import QApplication, QLabel
 from tkinter import *
 from tkinter import ttk
 from flask import Flask, render_template, request
-from DeviceControl import Read_Sensors, TurnPelletStoveOn, initialize_Sensors
+from DeviceControl import Read_Sensors, TurnPelletStoveOn, initialize_Sensors, GetTrueTemperature
 import Schedule
 
-def GetTrueTemperature(temperature, tempsList: np.ndarray):
-    # maintain a rolling list of last 10 temperature readings
-    if tempsList.__len__() >= 10:
-        tempsList = np.roll(tempsList, -1)
-        tempsList[9] = temperature
-    else:
-        tempsList.append(temperature)
 
-    # compute mean ignoring NaNs (handles initial empty slots)
-    trueTemp = float(np.nanmean(tempsList))
-
-    return tempsList, trueTemp
 
 def __main__():
     bus, address, calibration_params, gpio = initialize_Sensors()
@@ -59,6 +49,8 @@ def __main__():
     frm.grid()
     ttk.Label(frm, text="Hello World!").grid(column=0, row=0)
     ttk.Button(frm, text="Quit", command=root.destroy).grid(column=1, row=0)
+    
+    root.update()
 
     
     offDelaySeconds = 30 * 60  # 30 minutes
@@ -66,7 +58,7 @@ def __main__():
 
     if __debug__:
         offDelaySeconds = 10  # 30 seconds for testing
-        onDelaySeconds = 10   # 60 seconds for testing
+        onDelaySeconds = 10   # 60 seconds for testing  
 
     # set up a simple schedule with the same schedule every day
     for day in range(7):
