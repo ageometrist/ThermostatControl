@@ -27,13 +27,24 @@ def __main__():
 
     currentSchedule = Schedule.Schedule()
 
+    # take initial readings to fill the lastTemps array
+    for i in range(10):
+        temperature_celsius, humidity, pressure, timestamp_tz, temperature_fahrenheit = Read_Sensors(bus, address, calibration_params)
+        lastTemps, trueTemperature = GetTrueTemperature(temperature_fahrenheit, lastTemps)
+        time.sleep(5)  # wait for 5 seconds between readings
+
     timeTurnedOn: datetime.datetime = None
-    timeTurnedOff: datetime.datetime = None
+
+    # initialize to 55 minutes ago so it waits 5 minutes before turning on
+    timeTurnedOff: datetime.datetime = datetime.datetime.now() - datetime.timedelta(minutes=55)  
+
+    # initially turn off pellet stove
+    pellletStoveState = TurnPelletStoveOn(gpio, False)
 
     # set up a simple schedule with the same schedule every day
     for day in range(7):
         currentSchedule.add_schedule(day, datetime.time(0, 0), datetime.time(4, 0), 61.0) 
-        currentSchedule.add_schedule(day, datetime.time(4, 0), datetime.time(11, 0), 70.0)
+        currentSchedule.add_schedule(day, datetime.time(4, 0), datetime.time(11, 0), 69.0)
         currentSchedule.add_schedule(day, datetime.time(11, 0), datetime.time(16, 0), 68.0) 
         currentSchedule.add_schedule(day, datetime.time(16, 0), datetime.time(18, 0), 70.0)
         currentSchedule.add_schedule(day, datetime.time(18, 0), datetime.time(23, 59), 61.0)
@@ -89,6 +100,8 @@ def __main__():
             
             # Print the readings
             print(timestamp_tz.strftime('%H:%M:%S %d/%m/%Y') + " Temp={0:0.1f}ºC, Temp={1:0.1f}ºF, Humidity={2:0.1f}%, Pressure={3:0.2f}hPa".format(temperature_celsius, temperature_fahrenheit, humidity, pressure))
+            print("Target Temperature: {:.1f}ºF".format(targetTemp))
+            print("True Temperature (smoothed): {:.1f}ºF".format(trueTemperature))
             print('Pellet Stove State = ' + str(pellletStoveState))
             if timeSinceOn is not None:
                 print("Time since turned on: " + str(timeSinceOn / 60.0) + " minutes")
