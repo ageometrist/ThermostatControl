@@ -5,9 +5,7 @@ import time
 import pytz
 import datetime
 import numpy as np
-
-if __debug__:
-    from gpiozero import LED
+from gpiozero import LED
 
 def initialize_Sensors():
     # BME280 sensor address (default address)
