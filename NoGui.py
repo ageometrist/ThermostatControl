@@ -59,21 +59,38 @@ def __main__():
             else:
                 timeSinceOn = None
 
-            if trueTemperature < targetTemp - 2:
-                if pellletStoveState == False:
-                    if timeSinceOff is None or timeSinceOff >= 60*60:  # 60 minute delay after turning off
-                        timeTurnedOn = datetime.datetime.now()
-                        pellletStoveState = TurnPelletStoveOn(gpio, True)
+            # within the target range, do nothing
+            if targetTemp - 2 <= trueTemperature <= targetTemp + 2:
+                pass
+
+            # above target temp, turn off pellet stove
+            elif trueTemperature > targetTemp + 2 and pellletStoveState == True:
+                if timeSinceOn is None or timeSinceOn >= 90*60:  # 90 minute delay after turning on
+                    timeTurnedOff = datetime.datetime.now()
+                    pellletStoveState = TurnPelletStoveOn(gpio, False)
+            
+            # below target temp, turn on pellet stove
+            elif trueTemperature < targetTemp - 2 and pellletStoveState == False:
+                if timeSinceOff is None or timeSinceOff >= 60*60:  # 60 minute delay after turning off
+                    timeTurnedOn = datetime.datetime.now()
+                    pellletStoveState = TurnPelletStoveOn(gpio, True)
+
+            # if trueTemperature < targetTemp - 2:
+            #     if pellletStoveState == False:
+            #         if timeSinceOff is None or timeSinceOff >= 60*60:  # 60 minute delay after turning off
+            #             timeTurnedOn = datetime.datetime.now()
+            #             pellletStoveState = TurnPelletStoveOn(gpio, True)
                 
-            elif trueTemperature > targetTemp + 2:
-                if pellletStoveState == True:
-                    if timeSinceOn is None or timeSinceOff >= 90*60:  # 90 minute delay after turning on
-                        timeTurnedOff = datetime.datetime.now()
-                        pellletStoveState = TurnPelletStoveOn(gpio, False)
+            # elif trueTemperature > targetTemp + 2:
+            #     if pellletStoveState == True:
+            #         if timeSinceOn is None or timeSinceOn >= 90*60:  # 90 minute delay after turning on
+            #             timeTurnedOff = datetime.datetime.now()
+            #             pellletStoveState = TurnPelletStoveOn(gpio, False)
             
             # Print the readings
             print(timestamp_tz.strftime('%H:%M:%S %d/%m/%Y') + " Temp={0:0.1f}ºC, Temp={1:0.1f}ºF, Humidity={2:0.1f}%, Pressure={3:0.2f}hPa".format(temperature_celsius, temperature_fahrenheit, humidity, pressure))
-            print(pellletStoveState)
+            print('Pellet Stove State = ' + pellletStoveState + " Time since turned on: " + str(timeSinceOn / 60) + " minutes, Time since turned off: " + str(timeSinceOff / 60) + " minutes")
+
             if __debug__:
                 # Save time, date, temperature, humidity, and pressure in .txt file
                 file.write(timestamp_tz.strftime('%H:%M:%S %d/%m/%Y') + ', {:.2f}, {:.2f}, {:.2f}, {:.2f}\n'.format(temperature_celsius, temperature_fahrenheit, humidity, pressure))
