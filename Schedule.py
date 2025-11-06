@@ -16,9 +16,10 @@ class Schedule:
 
     def get_target_temperature(self, current_datetime: datetime.datetime):
         """Get the target temperature based on the current date and time."""
-        day_of_week = current_datetime.weekday # Get the day of the week
+        day_of_week = current_datetime.weekday() # Get the day of the week
         current_time = current_datetime.time() # Get the current time
-
+        
+        print("Checking schedule for day:", day_of_week, "at time:", current_time)
         # Check the schedule for the current day
         if day_of_week in self.schedule:
             for entry in self.schedule[day_of_week]:

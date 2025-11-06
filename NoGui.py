@@ -31,12 +31,12 @@ def __main__():
     for i in range(10):
         temperature_celsius, humidity, pressure, timestamp_tz, temperature_fahrenheit = Read_Sensors(bus, address, calibration_params)
         lastTemps, trueTemperature = GetTrueTemperature(temperature_fahrenheit, lastTemps)
-        time.sleep(5)  # wait for 5 seconds between readings
+        time.sleep(2)  # wait for 5 seconds between readings
 
     timeTurnedOn: datetime.datetime = None
 
-    # initialize to 55 minutes ago so it waits 5 minutes before turning on
-    timeTurnedOff: datetime.datetime = datetime.datetime.now() - datetime.timedelta(minutes=55)  
+    # initialize to 60 minutes ago so it can turn on immediately
+    timeTurnedOff: datetime.datetime = datetime.datetime.now() - datetime.timedelta(minutes=60)  
 
     # initially turn off pellet stove
     pellletStoveState = TurnPelletStoveOn(gpio, False)
