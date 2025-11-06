@@ -89,7 +89,7 @@ def __main__():
             
             # Print the readings
             print(timestamp_tz.strftime('%H:%M:%S %d/%m/%Y') + " Temp={0:0.1f}ºC, Temp={1:0.1f}ºF, Humidity={2:0.1f}%, Pressure={3:0.2f}hPa".format(temperature_celsius, temperature_fahrenheit, humidity, pressure))
-            print('Pellet Stove State = ' + pellletStoveState + " Time since turned on: " + str(timeSinceOn / 60) + " minutes, Time since turned off: " + str(timeSinceOff / 60) + " minutes")
+            print('Pellet Stove State = ' + str(pellletStoveState) + " Time since turned on: " + str(timeSinceOn / 60) + " minutes, Time since turned off: " + str(timeSinceOff / 60) + " minutes")
 
             if __debug__:
                 # Save time, date, temperature, humidity, and pressure in .txt file
